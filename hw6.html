@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECE362 HW6 Study Animations</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Open Sans', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+            color: #e0e0e0;
+        }
+        .navbar {
+            background-color: #1e3a8a;
+            padding: 15px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+        .navbar a {
+            float: left;
+            color: #fff;
+            text-align: center;
+            padding: 12px 20px;
+            text-decoration: none;
+            font-size: 18px;
+            font-family: 'Roboto', sans-serif;
+            transition: transform 0.2s, background-color 0.3s;
+        }
+        .navbar a:hover {
+            background-color: #3b82f6;
+            transform: scale(1.05);
+        }
+        h1 {
+            font-family: 'Roboto', sans-serif;
+            text-align: center;
+            color: #00ff88;
+            margin: 40px 0;
+            font-size: 2.5em;
+            text-shadow: 0 0 5px rgba(0, 255, 136, 0.5);
+        }
+        .content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .section {
+            background: #2a2a2a;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s;
+            animation: fadeIn 0.5s ease-in;
+        }
+        .section:hover {
+            transform: translateY(-5px);
+        }
+        h2 {
+            font-family: 'Roboto', sans-serif;
+            color: #00ff88;
+            margin-bottom: 15px;
+        }
+        .description {
+            font-size: 1.1em;
+            color: #b0b0b0;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        .description strong {
+            color: #00ff88;
+        }
+        .description .tooltip {
+            position: relative;
+            cursor: help;
+            border-bottom: 1px dotted #b0b0b0;
+        }
+        .description .tooltip:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e3a8a;
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.9em;
+            white-space: nowrap;
+            z-index: 10;
+        }
+        .signal-container {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            background: #3a3a3a;
+            padding: 20px;
+            border-radius: 10px;
+            height: 150px;
+            position: relative;
+            overflow: hidden;
+        }
+        .signal-row {
+            display: flex;
+            align-items: center;
+            height: 50px;
+            position: relative;
+        }
+        .signal-label {
+            width: 80px;
+            font-weight: 600;
+            color: #b0b0b0;
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        .signal-bits {
+            display: flex;
+            flex: 1;
+            margin-left: 90px;
+        }
+        .bit {
+            width: 40px;
+            height: 40px;
+            text-align: center;
+            line-height: 40px;
+            border: 2px solid #555;
+            border-radius: 8px;
+            margin: 0 2px;
+            background: #2a2a2a;
+            font-size: 16px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            position: absolute;
+            transition: transform 0.3s ease, background-color 0.3s, border-color 0.3s;
+        }
+        .bit.low {
+            transform: translateY(25px);
+            background: #2a2a2a;
+            border-color: #555;
+            color: #b0b0b0;
+        }
+        .bit.high {
+            transform: translateY(-25px);
+            background: #00ff88;
+            color: #000;
+            border-color: #00ff88;
+            box-shadow: 0 4px 8px rgba(0, 255, 136, 0.4);
+        }
+        .bit.connection::after {
+            content: '';
+            position: absolute;
+            width: 2px;
+            height: 50px;
+            background: #facc15;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .bit.connection.visible::after {
+            opacity: 1;
+        }
+        .controls {
+            margin-top: 25px;
+            text-align: center;
+        }
+        button {
+            padding: 12px 25px;
+            margin: 0 10px;
+            cursor: pointer;
+            background: linear-gradient(135deg, #00ff88, #00cc66);
+            color: #000;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Roboto', sans-serif;
+            font-size: 16px;
+            transition: background 0.3s, transform 0.2s;
+        }
+        button:hover {
+            background: linear-gradient(135deg, #00cc66, #009944);
+            transform: scale(1.05);
+        }
+        .calculation-steps {
+            margin-top: 20px;
+            padding: 15px;
+            background: #444;
+            border-radius: 10px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease;
+        }
+        .calculation-steps.visible {
+            max-height: 300px;
+        }
+        .calculation-steps p {
+            margin: 10px 0;
+            color: #e0e0e0;
+        }
+        .step-highlight {
+            background-color: #00ff88;
+            color: #000;
+            padding: 5px;
+            border-radius: 5px;
+        }
+        #back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #1e3a8a;
+            color: #fff;
+            padding: 10px 15px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: none;
+            transition: opacity 0.3s;
+        }
+        #back-to-top:hover {
+            opacity: 0.8;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @media (max-width: 768px) {
+            .navbar a {
+                float: none;
+                display: block;
+                text-align: left;
+            }
+            h1 {
+                font-size: 2em;
+            }
+            .section {
+                padding: 20px;
+            }
+            .bit {
+                width: 30px;
+                height: 30px;
+                line-height: 30px;
+                margin: 0 2px;
+            }
+            .signal-label {
+                width: 60px;
+            }
+            .signal-container {
+                height: 120px;
+            }
+            .bit.low { transform: translateY(20px); }
+            .bit.high { transform: translateY(-20px); }
+            .bit.connection::after { height: 40px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <a href="index.html">Home</a>
+        <a href="hw2.html">HW2</a>
+        <a href="hw3.html">HW3</a>
+        <a href="hw4.html">HW4</a>
+        <a href="hw5.html">HW5</a>
+        <a href="hw6.html">HW6</a>
+        <a href="hw7.html">HW7</a>
+    </div>
+    <h1>ECE362 HW6 Study Animations</h1>
+    <div class="content">
+        <div class="section" id="spi-word-section">
+            <h2>Problem 1: SPI Word Size</h2>
+            <div class="description">
+                Given the <span class="tooltip" data-tooltip="Serial Peripheral Interface: A synchronous protocol using clock (SCK) and data (MOSI) lines.">SPI</span> signal below, find the <strong>word size</strong> in bits, read on <strong>rising edges</strong> of SCK. The signal has <strong>15 rising edges</strong>, indicating <strong>15 bits</strong>.
+            </div>
+            <div class="signal-container">
+                <div class="signal-row">
+                    <span class="signal-label">NSS</span>
+                    <div class="signal-bits" id="spi-word-nss"></div>
+                </div>
+                <div class="signal-row">
+                    <span class="signal-label">SCK</span>
+                    <div class="signal-bits" id="spi-word-sck"></div>
+                </div>
+                <div class="signal-row">
+                    <span class="signal-label">MOSI</span>
+                    <div class="signal-bits" id="spi-word-mosi"></div>
+                </div>
+            </div>
+            <div class="calculation-steps" id="spi-word-steps">
+                <p>Count rising edges of SCK: 15</p>
+                <p>Word size = 15 bits</p>
+            </div>
+            <div class="controls">
+                <button id="spi-word-animate-btn">Animate</button>
+                <button id="spi-word-steps-btn">Show Steps</button>
+                <button id="spi-word-reset-btn">Reset</button>
+            </div>
+        </div>
+
+        <div class="section" id="spi-value-section">
+            <h2>Problem 2: SPI Transmitted Value</h2>
+            <div class="description">
+                For the same SPI signal (<strong>110001000010110</strong>), find the <strong>value transmitted</strong> (LSB first). The animation flips it to <strong>0x3423</strong>.
+            </div>
+            <div class="signal-container">
+                <div class="signal-row">
+                    <span class="signal-label">MOSI</span>
+                    <div class="signal-bits" id="spi-value-mosi"></div>
+                </div>
+            </div>
+            <div class="calculation-steps" id="spi-value-steps">
+                <p>MOSI: 110001000010110</p>
+                <p>Flip (LSB first): 0011010000010011</p>
+                <p>Value = 0x3423</p>
+            </div>
+            <div class="controls">
+                <button id="spi-value-animate-btn">Animate</button>
+                <button id="spi-value-steps-btn">Show Steps</button>
+                <button id="spi-value-reset-btn">Reset</button>
+            </div>
+        </div>
+
+        <div class="section" id="uart-encode-section">
+            <h2>Problem 3: UART Encoding</h2>
+            <div class="description">
+                Encode <strong>0x53</strong> for <span class="tooltip" data-tooltip="Universal Asynchronous Receiver/Transmitter: Sends data serially with start/stop bits.">UART</span> with 1 start bit, 8-bit word, no parity, 1 stop bit. The animation shows <strong>0110010101</strong>.
+            </div>
+            <div class="signal-container">
+                <div class="signal-row">
+                    <span class="signal-label">UART</span>
+                    <div class="signal-bits" id="uart-encode-signal"></div>
+                </div>
+            </div>
+            <div class="calculation-steps" id="uart-encode-steps">
+                <p>Start Bit: 0</p>
+                <p>Data (0x53 flipped): 11001010</p>
+                <p>Stop Bit: 1</p>
+                <p>Full Signal: 0110010101</p>
+            </div>
+            <div class="controls">
+                <button id="uart-encode-animate-btn">Animate</button>
+                <button id="uart-encode-steps-btn">Show Steps</button>
+                <button id="uart-encode-reset-btn">Reset</button>
+            </div>
+        </div>
+
+        <div class="section" id="uart-word-section">
+            <h2>Problem 4: UART Decoded Word</h2>
+            <div class="description">
+                Decode an ASCII word from a UART signal (7-bit word, 1 parity, 1 stop). The animation shows the first frame (<strong>0100100110</strong>) for 'd', with steps for all ("desk").
+            </div>
+            <div class="signal-container">
+                <div class="signal-row">
+                    <span class="signal-label">UART</span>
+                    <div class="signal-bits" id="uart-word-signal"></div>
+                </div>
+            </div>
+            <div class="calculation-steps" id="uart-word-steps">
+                <p>First: 0100100110 → 0010011 → 1100100 (0x64 = 'd')</p>
+                <p>Second: 0100110110 → 1101100 (0x65 = 'e')</p>
+                <p>Third: 0110101110 → 1101101 (0x73 = 's')</p>
+                <p>Fourth: 0100111110 → 1111001 (0x6B = 'k')</p>
+                <p>Word: "desk"</p>
+            </div>
+            <div class="controls">
+                <button id="uart-word-animate-btn">Animate</button>
+                <button id="uart-word-steps-btn">Show Steps</button>
+                <button id="uart-word-reset-btn">Reset</button>
+            </div>
+        </div>
+
+        <div class="section" id="parity-section">
+            <h2>Problem 5: Odd Parity Meaning</h2>
+            <div class="description">
+                Define <strong>odd parity</strong> in UART. The animation shows a frame where the total number of 1s (data + parity) is odd, confirming option c.
+            </div>
+            <div class="signal-container">
+                <div class="signal-row">
+                    <span class="signal-label">Data</span>
+                    <div class="signal-bits" id="parity-data"></div>
+                </div>
+            </div>
+            <div class="calculation-steps" id="parity-steps">
+                <p>Data: 10101010 (4 ones)</p>
+                <p>Parity Bit: 1</p>
+                <p>Total 1s: 5 (odd)</p>
+            </div>
+            <div class="controls">
+                <button id="parity-animate-btn">Animate</button>
+                <button id="parity-steps-btn">Show Steps</button>
+                <button id="parity-reset-btn">Reset</button>
+            </div>
+        </div>
+
+        <div class="section" id="baud-words-section">
+            <h2>Problem 6: Words per Second</h2>
+            <div class="description">
+                Calculate <strong>useful words per second</strong> at 13540 baud with 1 start, 8 data, 1 stop bit. The animation simulates a frame, showing <strong>1354 words/s</strong>.
+            </div>
+            <div class="signal-container">
+                <div class="signal-row">
+                    <span class="signal-label">Frame</span>
+                    <div class="signal-bits" id="baud-words-frame"></div>
+                </div>
+            </div>
+            <div class="calculation-steps" id="baud-words-steps">
+                <p>Total bits: 1 + 8 + 1 = 10</p>
+                <p>Baud rate: 13540</p>
+                <p>Words/s: 13540 / 10 = 1354</p>
+            </div>
+            <div class="controls">
+                <button id="baud-words-animate-btn">Animate</button>
+                <button id="baud-words-steps-btn">Show Steps</button>
+                <button id="baud-words-reset-btn">Reset</button>
+            </div>
+        </div>
+
+        <div class="section" id="baud-rate-section">
+            <h2>Problem 7: UART Baud Rate</h2>
+            <div class="description">
+                Find the <strong>baud rate</strong> for a UART frame where 10 bits take 50 ms. The animation shows signal changes, yielding <strong>200 baud</strong>.
+            </div>
+            <div class="signal-container">
+                <div class="signal-row">
+                    <span class="signal-label">UART</span>
+                    <div class="signal-bits" id="baud-rate-signal"></div>
+                </div>
+            </div>
+            <div class="calculation-steps" id="baud-rate-steps">
+                <p>10 bits in 50 ms</p>
+                <p>Signal changes/s: 10 / 0.05 = 200</p>
+            </div>
+            <div class="controls">
+                <button id="baud-rate-animate-btn">Animate</button>
+                <button id="baud-rate-steps-btn">Show Steps</button>
+                <button id="baud-rate-reset-btn">Reset</button>
+            </div>
+        </div>
+
+        <div class="section" id="parity-error-section">
+            <h2>Problem 8: Parity Error</h2>
+            <div class="description">
+                Identify data causing an <strong>odd parity error</strong> (1 start, 8 data, 1 parity, 1 stop). The animation highlights option c (even 1s) as incorrect.
+            </div>
+            <div class="signal-container">
+                <div class="signal-row">
+                    <span class="signal-label">Data</span>
+                    <div class="signal-bits" id="parity-error-data"></div>
+                </div>
+            </div>
+            <div class="calculation-steps" id="parity-error-steps">
+                <p>Data: 11110000 (4 ones)</p>
+                <p>Parity: 0</p>
+                <p>Total 1s: 4 (even, error)</p>
+            </div>
+            <div class="controls">
+                <button id="parity-error-animate-btn">Animate</button>
+                <button id="parity-error-steps-btn">Show Steps</button>
+                <button id="parity-error-reset-btn">Reset</button>
+            </div>
+        </div>
+
+        <div class="section" id="i2c-config-section">
+            <h2>Problem 9: I2C Open-Drain</h2>
+            <div class="description">
+                Why are <span class="tooltip" data-tooltip="Inter-Integrated Circuit: A bus protocol using SDA (data) and SCL (clock).">I2C</span> SDA/SCL lines open-drain and pulled up? The animation shows option a (wired AND logic).
+            </div>
+            <div class="signal-container">
+                <div class="signal-row">
+                    <span class="signal-label">SDA</span>
+                    <div class="signal-bits" id="i2c-config-sda"></div>
+                </div>
+            </div>
+            <div class="calculation-steps" id="i2c-config-steps">
+                <p>All high: SDA = 1</p>
+                <p>Any low: SDA = 0 (wired AND)</p>
+            </div>
+            <div class="controls">
+                <button id="i2c-config-animate-btn">Animate</button>
+                <button id="i2c-config-steps-btn">Show Steps</button>
+                <button id="i2c-config-reset-btn">Reset</button>
+            </div>
+        </div>
+
+        <div class="section" id="i2c-spi-section">
+            <h2>Problem 10: I2C vs SPI</h2>
+            <div class="description">
+                Compare I2C and SPI, identifying the wrong statement. The animation shows option c is incorrect (I2C is not half-duplex).
+            </div>
+            <div class="signal-container">
+                <div class="signal-row">
+                    <span class="signal-label">SPI</span>
+                    <div class="signal-bits" id="i2c-spi-spi"></div>
+                </div>
+                <div class="signal-row">
+                    <span class="signal-label">I2C</span>
+                    <div class="signal-bits" id="i2c-spi-i2c"></div>
+                </div>
+            </div>
+            <div class="calculation-steps" id="i2c-spi-steps">
+                <p>SPI: Full duplex (MOSI/MISO)</p>
+                <p>I2C: Full duplex possible</p>
+            </div>
+            <div class="controls">
+                <button id="i2c-spi-animate-btn">Animate</button>
+                <button id="i2c-spi-steps-btn">Show Steps</button>
+                <button id="i2c-spi-reset-btn">Reset</button>
+            </div>
+        </div>
+
+        <div class="section" id="i2c-data-section">
+            <h2>Problem 11: I2C Data Rate</h2>
+            <div class="description">
+                Calculate <strong>bytes/s</strong> for an I2C transfer at 9600 baud (29 bits, 2 bytes). The animation simulates the 29-bit transaction, showing <strong>662.07 bytes/s</strong>.
+            </div>
+            <div class="signal-container">
+                <div class="signal-row">
+                    <span class="signal-label">SDA</span>
+                    <div class="signal-bits" id="i2c-data-sda"></div>
+                </div>
+                <div class="signal-row">
+                    <span class="signal-label">SCL</span>
+                    <div class="signal-bits" id="i2c-data-scl"></div>
+                </div>
+            </div>
+            <div class="calculation-steps" id="i2c-data-steps">
+                <p>29 bits/transaction</p>
+                <p>Transactions/s: 9600 / 29 = 331.03</p>
+                <p>Bytes/s: 331.03 * 2 = 662.07</p>
+            </div>
+            <div class="controls">
+                <button id="i2c-data-animate-btn">Animate</button>
+                <button id="i2c-data-steps-btn">Show Steps</button>
+                <button id="i2c-data-reset-btn">Reset</button>
+            </div>
+        </div>
+    </div>
+    <div id="back-to-top" onclick="scrollToTop()">↑</div>
+
+    <script>
+        // Problem 1: SPI Word Size
+        function initSpiWordAnimation() {
+            const nssBits = document.getElementById('spi-word-nss');
+            const sckBits = document.getElementById('spi-word-sck');
+            const mosiBits = document.getElementById('spi-word-mosi');
+            const steps = document.getElementById('spi-word-steps');
+            const animateBtn = document.getElementById('spi-word-animate-btn');
+            const stepsBtn = document.getElementById('spi-word-steps-btn');
+            const resetBtn = document.getElementById('spi-word-reset-btn');
+
+            // Clear existing content
+            nssBits.innerHTML = '';
+            sckBits.innerHTML = '';
+            mosiBits.innerHTML = '';
+
+            // NSS signal - starts high, goes low
+            for (let i = 0; i < 15; i++) {
+                nssBits.innerHTML += `<span class="bit high" style="left: ${i * 44}px;">1</span>`;
+            }
+            
+            // SCK signal - starts low, alternates
+            for (let i = 0; i < 15; i++) {
+                sckBits.innerHTML += `<span class="bit low" style="left: ${i * 44}px;">0</span>`;
+            }
+            
+            // MOSI signal - based on the pattern in the image (110001000010110)
+            const mosiPattern = '110001000010110';
+            for (let i = 0; i < 15; i++) {
+                mosiBits.innerHTML += `<span class="bit low" style="left: ${i * 44}px;">${mosiPattern[i]}</span>`;
+            }
+
+            function animate() {
+                reset();
+                const mosiValue = '110001000010110';
+                let sckState = 0;
+                
+                // First show NSS going low (active)
+                setTimeout(() => {
+                    for (let i = 0; i < 15; i++) {
+                        nssBits.children[i].classList.add('active');
+                        nssBits.children[i].classList.remove('high');
+                        nssBits.children[i].classList.add('low');
+                        nssBits.children[i].textContent = '0';
+                    }
+                }, 500);
+                
+                // Then animate each bit with SCK and MOSI
+                for (let i = 0; i < 15; i++) {
+                    setTimeout(() => {
+                        // Activate SCK bits (alternating)
+                        sckBits.children[i].classList.add('active');
+                        sckBits.children[i].classList.toggle('high', sckState === 1);
+                        sckBits.children[i].classList.toggle('low', sckState === 0);
+                        sckBits.children[i].textContent = sckState ? '1' : '0';
+                        
+                        // Activate MOSI bits
+                        mosiBits.children[i].classList.add('active');
+                        mosiBits.children[i].classList.toggle('high', mosiValue[i] === '1');
+                        mosiBits.children[i].classList.toggle('low', mosiValue[i] === '0');
+                        mosiBits.children[i].textContent = mosiValue[i];
+                        
+                        // Add connection visual for rising edge sampling
+                        if (sckState === 1) { // On rising edges
+                            mosiBits.children[i].classList.add('connection');
+                            setTimeout(() => mosiBits.children[i].classList.add('visible'), 100);
+                        }
+                        sckState = !sckState;
+                    }, 1000 + i * 500);
+                }
+                
+                setTimeout(() => highlightSteps(steps), 1000 + 15 * 500 + 500);
+            }
+
+            function reset() {
+                // Reset NSS (starts high)
+                [...nssBits.children].forEach(bit => {
+                    bit.classList.remove('active', 'connection', 'visible', 'low');
+                    bit.classList.add('high');
+                    bit.textContent = '1';
+                });
+                
+                // Reset SCK (starts low, alternates)
+                [...sckBits.children].forEach((bit, i) => {
+                    bit.classList.remove('active', 'connection', 'visible', 'high');
+                    bit.classList.add('low');
+                    bit.textContent = '0';
+                });
+                
+                // Reset MOSI (pattern from image)
+                const mosiPattern = '110001000010110';
+                [...mosiBits.children].forEach((bit, i) => {
+                    bit.classList.remove('active', 'connection', 'visible', 'high');
+                    bit.classList.add('low');
+                    bit.textContent = mosiPattern[i];
+                });
+                
+                steps.classList.remove('visible');
+                stepsBtn.textContent = 'Show Steps';
+            }
+
+            animateBtn.addEventListener('click', animate);
+            stepsBtn.addEventListener('click', () => toggleSteps(steps, stepsBtn));
+            resetBtn.addEventListener('click', reset);
+            
+            // Initialize with the correct pattern visible
+            reset();
+        }
+
+        // Problem 2: SPI Transmitted Value
+        function initSpiValueAnimation() {
+            const mosiBits = document.getElementById('spi-value-mosi');
+            const steps = document.getElementById('spi-value-steps');
+            const animateBtn = document.getElementById('spi-value-animate-btn');
+            const stepsBtn = document.getElementById('spi-value-steps-btn');
+            const resetBtn = document.getElementById('spi-value-reset-btn');
+
+            // Clear existing content
+            mosiBits.innerHTML = '';
+
+            // MOSI signal - based on the pattern in the image (110001000010110)
+            const mosiPattern = '110001000010110';
+            for (let i = 0; i < 15; i++) {
+                mosiBits.innerHTML += `<span class="bit low" style="left: ${i * 44}px;">${mosiPattern[i]}</span>`;
+            }
+
+            function animate() {
+                reset();
+                const mosiValue = '110001000010110';
+                mosiValue.split('').forEach((bit, i) => {
+                    setTimeout(() => {
+                        mosiBits.children[i].classList.add('active');
+                        mosiBits.children[i].classList.toggle('high', bit === '1');
+                        mosiBits.children[i].classList.toggle('low', bit === '0');
+                        mosiBits.children[i].textContent = bit;
+                        if (bit === '1') {
+                            mosiBits.children[i].classList.add('connection');
+                            setTimeout(() => mosiBits.children[i].classList.add('visible'), 100);
+                        }
+                    }, i * 500);
+                });
+                setTimeout(() => highlightSteps(steps), 15 * 500 + 500);
+            }
+
+            function reset() {
+                const mosiPattern = '110001000010110';
+                [...mosiBits.children].forEach((bit, i) => {
+                    bit.classList.remove('active', 'connection', 'visible', 'high');
+                    bit.classList.add('low');
+                    bit.textContent = mosiPattern[i];
+                });
+                steps.classList.remove('visible');
+                stepsBtn.textContent = 'Show Steps';
+            }
+
+            animateBtn.addEventListener('click', animate);
+            stepsBtn.addEventListener('click', () => toggleSteps(steps, stepsBtn));
+            resetBtn.addEventListener('click', reset);
+            
+            // Initialize with the correct pattern visible
+            reset();
+        }
+
+        // Problem 3: UART Encoding
+        function initUartEncodeAnimation() {
+            const signalBits = document.getElementById('uart-encode-signal');
+            const steps = document.getElementById('uart-encode-steps');
+            const animateBtn = document.getElementById('uart-encode-animate-btn');
+            const stepsBtn = document.getElementById('uart-encode-steps-btn');
+            const resetBtn = document.getElementById('uart-encode-reset-btn');
+
+            for (let i = 0; i < 10; i++) {
+                signalBits.innerHTML += `<span class="bit low" style="left: ${i * 44}px;">0</span>`;
+            }
+
+            function animate() {
+                reset();
+                const signal = '0110010101';
+                signal.split('').forEach((bit, i) => {
+                    setTimeout(() => {
+                        signalBits.children[i].classList.add('active');
+                        signalBits.children[i].classList.toggle('high', bit === '1');
+                        signalBits.children[i].classList.toggle('low', bit === '0');
+                        signalBits.children[i].textContent = bit;
+                        if (bit === '1') {
+                            signalBits.children[i].classList.add('connection');
+                            setTimeout(() => signalBits.children[i].classList.add('visible'), 100);
+                        }
+                    }, i * 500);
+                });
+                setTimeout(() => highlightSteps(steps), 10 * 500 + 500);
+            }
+
+            function reset() {
+                [...signalBits.children].forEach(bit => {
+                    bit.classList.remove('active', 'high', 'low', 'connection', 'visible');
+                    bit.classList.add('low');
+                    bit.textContent = '0';
+                });
+                steps.classList.remove('visible');
+                stepsBtn.textContent = 'Show Steps';
+            }
+
+            animateBtn.addEventListener('click', animate);
+            stepsBtn.addEventListener('click', () => toggleSteps(steps, stepsBtn));
+            resetBtn.addEventListener('click', reset);
+        }
+
+        // Problem 4: UART Decoded Word
+        function initUartWordAnimation() {
+            const signalBits = document.getElementById('uart-word-signal');
+            const steps = document.getElementById('uart-word-steps');
+            const animateBtn = document.getElementById('uart-word-animate-btn');
+            const stepsBtn = document.getElementById('uart-word-steps-btn');
+            const resetBtn = document.getElementById('uart-word-reset-btn');
+
+            for (let i = 0; i < 10; i++) {
+                signalBits.innerHTML += `<span class="bit low" style="left: ${i * 44}px;">0</span>`;
+            }
+
+            function animate() {
+                reset();
+                const signal = '0100100110'; // First frame: "d" (Start=0, 0010011, Parity=0, Stop=1)
+                signal.split('').forEach((bit, i) => {
+                    setTimeout(() => {
+                        signalBits.children[i].classList.add('active');
+                        signalBits.children[i].classList.toggle('high', bit === '1');
+                        signalBits.children[i].classList.toggle('low', bit === '0');
+                        signalBits.children[i].textContent = bit;
+                        if (bit === '1') {
+                            signalBits.children[i].classList.add('connection');
+                            setTimeout(() => signalBits.children[i].classList.add('visible'), 100);
+                        }
+                    }, i * 500);
+                });
+                setTimeout(() => highlightSteps(steps), 10 * 500 + 500);
+            }
+
+            function reset() {
+                [...signalBits.children].forEach(bit => {
+                    bit.classList.remove('active', 'high', 'low', 'connection', 'visible');
+                    bit.classList.add('low');
+                    bit.textContent = '0';
+                });
+                steps.classList.remove('visible');
+                stepsBtn.textContent = 'Show Steps';
+            }
+
+            animateBtn.addEventListener('click', animate);
+            stepsBtn.addEventListener('click', () => toggleSteps(steps, stepsBtn));
+            resetBtn.addEventListener('click', reset);
+        }
+
+        // Problem 5: Odd Parity
+        function initParityAnimation() {
+            const dataBits = document.getElementById('parity-data');
+            const steps = document.getElementById('parity-steps');
+            const animateBtn = document.getElementById('parity-animate-btn');
+            const stepsBtn = document.getElementById('parity-steps-btn');
+            const resetBtn = document.getElementById('parity-reset-btn');
+
+            for (let i = 0; i < 10; i++) {
+                dataBits.innerHTML += `<span class="bit low" style="left: ${i * 44}px;">0</span>`;
+            }
+
+            function animate() {
+                reset();
+                const signal = '0101010111';
+                signal.split('').forEach((bit, i) => {
+                    setTimeout(() => {
+                        dataBits.children[i].classList.add('active');
+                        dataBits.children[i].classList.toggle('high', bit === '1');
+                        dataBits.children[i].classList.toggle('low', bit === '0');
+                        dataBits.children[i].textContent = bit;
+                        if (bit === '1') {
+                            dataBits.children[i].classList.add('connection');
+                            setTimeout(() => dataBits.children[i].classList.add('visible'), 100);
+                        }
+                    }, i * 500);
+                });
+                setTimeout(() => highlightSteps(steps), 10 * 500 + 500);
+            }
+
+            function reset() {
+                [...dataBits.children].forEach(bit => {
+                    bit.classList.remove('active', 'high', 'low', 'connection', 'visible');
+                    bit.classList.add('low');
+                    bit.textContent = '0';
+                });
+                steps.classList.remove('visible');
+                stepsBtn.textContent = 'Show Steps';
+            }
+
+            animateBtn.addEventListener('click', animate);
+            stepsBtn.addEventListener('click', () => toggleSteps(steps, stepsBtn));
+            resetBtn.addEventListener('click', reset);
+        }
+
+        // Problem 6: Words per Second
+        function initBaudWordsAnimation() {
+            const frameBits = document.getElementById('baud-words-frame');
+            const steps = document.getElementById('baud-words-steps');
+            const animateBtn = document.getElementById('baud-words-animate-btn');
+            const stepsBtn = document.getElementById('baud-words-steps-btn');
+            const resetBtn = document.getElementById('baud-words-reset-btn');
+
+            for (let i = 0; i < 10; i++) {
+                frameBits.innerHTML += `<span class="bit low" style="left: ${i * 44}px;">0</span>`;
+            }
+
+            function animate() {
+                reset();
+                const signal = '0110010101';
+                signal.split('').forEach((bit, i) => {
+                    setTimeout(() => {
+                        frameBits.children[i].classList.add('active');
+                        frameBits.children[i].classList.toggle('high', bit === '1');
+                        frameBits.children[i].classList.toggle('low', bit === '0');
+                        frameBits.children[i].textContent = bit;
+                        if (bit === '1') {
+                            frameBits.children[i].classList.add('connection');
+                            setTimeout(() => frameBits.children[i].classList.add('visible'), 100);
+                        }
+                    }, i * 500);
+                });
+                setTimeout(() => highlightSteps(steps), 10 * 500 + 500);
+            }
+
+            function reset() {
+                [...frameBits.children].forEach(bit => {
+                    bit.classList.remove('active', 'high', 'low', 'connection', 'visible');
+                    bit.classList.add('low');
+                    bit.textContent = '0';
+                });
+                steps.classList.remove('visible');
+                stepsBtn.textContent = 'Show Steps';
+            }
+
+            animateBtn.addEventListener('click', animate);
+            stepsBtn.addEventListener('click', () => toggleSteps(steps, stepsBtn));
+            resetBtn.addEventListener('click', reset);
+        }
+
+        // Problem 7: Baud Rate
+        function initBaudRateAnimation() {
+            const signalBits = document.getElementById('baud-rate-signal');
+            const steps = document.getElementById('baud-rate-steps');
+            const animateBtn = document.getElementById('baud-rate-animate-btn');
+            const stepsBtn = document.getElementById('baud-rate-steps-btn');
+            const resetBtn = document.getElementById('baud-rate-reset-btn');
+
+            for (let i = 0; i < 10; i++) {
+                signalBits.innerHTML += `<span class="bit low" style="left: ${i * 44}px;">0</span>`;
+            }
+
+            function animate() {
+                reset();
+                const signal = '0110010101';
+                signal.split('').forEach((bit, i) => {
+                    setTimeout(() => {
+                        signalBits.children[i].classList.add('active');
+                        signalBits.children[i].classList.toggle('high', bit === '1');
+                        signalBits.children[i].classList.toggle('low', bit === '0');
+                        signalBits.children[i].textContent = bit;
+                        if (bit === '1') {
+                            signalBits.children[i].classList.add('connection');
+                            setTimeout(() => signalBits.children[i].classList.add('visible'), 100);
+                        }
+                    }, i * 500);
+                });
+                setTimeout(() => highlightSteps(steps), 10 * 500 + 500);
+            }
+
+            function reset() {
+                [...signalBits.children].forEach(bit => {
+                    bit.classList.remove('active', 'high', 'low', 'connection', 'visible');
+                    bit.classList.add('low');
+                    bit.textContent = '0';
+                });
+                steps.classList.remove('visible');
+                stepsBtn.textContent = 'Show Steps';
+            }
+
+            animateBtn.addEventListener('click', animate);
+            stepsBtn.addEventListener('click', () => toggleSteps(steps, stepsBtn));
+            resetBtn.addEventListener('click', reset);
+        }
+
+        // Problem 8: Parity Error
+        function initParityErrorAnimation() {
+            const dataBits = document.getElementById('parity-error-data');
+            const steps = document.getElementById('parity-error-steps');
+            const animateBtn = document.getElementById('parity-error-animate-btn');
+            const stepsBtn = document.getElementById('parity-error-steps-btn');
+            const resetBtn = document.getElementById('parity-error-reset-btn');
+
+            for (let i = 0; i < 10; i++) {
+                dataBits.innerHTML += `<span class="bit low" style="left: ${i * 44}px;">0</span>`;
+            }
+
+            function animate() {
+                reset();
+                const signal = '0111100001';
+                signal.split('').forEach((bit, i) => {
+                    setTimeout(() => {
+                        dataBits.children[i].classList.add('active');
+                        dataBits.children[i].classList.toggle('high', bit === '1');
+                        dataBits.children[i].classList.toggle('low', bit === '0');
+                        dataBits.children[i].textContent = bit;
+                        if (bit === '1') {
+                            dataBits.children[i].classList.add('connection');
+                            setTimeout(() => dataBits.children[i].classList.add('visible'), 100);
+                        }
+                    }, i * 500);
+                });
+                setTimeout(() => highlightSteps(steps), 10 * 500 + 500);
+            }
+
+            function reset() {
+                [...dataBits.children].forEach(bit => {
+                    bit.classList.remove('active', 'high', 'low', 'connection', 'visible');
+                    bit.classList.add('low');
+                    bit.textContent = '0';
+                });
+                steps.classList.remove('visible');
+                stepsBtn.textContent = 'Show Steps';
+            }
+
+            animateBtn.addEventListener('click', animate);
+            stepsBtn.addEventListener('click', () => toggleSteps(steps, stepsBtn));
+            resetBtn.addEventListener('click', reset);
+        }
+
+        // Problem 9: I2C Open-Drain
+        function initI2cConfigAnimation() {
+            const sdaBits = document.getElementById('i2c-config-sda');
+            const steps = document.getElementById('i2c-config-steps');
+            const animateBtn = document.getElementById('i2c-config-animate-btn');
+            const stepsBtn = document.getElementById('i2c-config-steps-btn');
+            const resetBtn = document.getElementById('i2c-config-reset-btn');
+
+            for (let i = 0; i < 5; i++) {
+                sdaBits.innerHTML += `<span class="bit low" style="left: ${i * 44}px;">1</span>`;
+            }
+
+            function animate() {
+                reset();
+                const stages = ['1', '1', '0', '0', '0'];
+                stages.forEach((bit, i) => {
+                    setTimeout(() => {
+                        sdaBits.children[i].classList.add('active');
+                        sdaBits.children[i].classList.toggle('high', bit === '1');
+                        sdaBits.children[i].classList.toggle('low', bit === '0');
+                        sdaBits.children[i].textContent = bit;
+                        if (bit === '0') {
+                            sdaBits.children[i].classList.add('connection');
+                            setTimeout(() => sdaBits.children[i].classList.add('visible'), 100);
+                        }
+                    }, i * 500);
+                });
+                setTimeout(() => highlightSteps(steps), 5 * 500 + 500);
+            }
+
+            function reset() {
+                [...sdaBits.children].forEach(bit => {
+                    bit.classList.remove('active', 'high', 'low', 'connection', 'visible');
+                    bit.classList.add('low');
+                    bit.textContent = '1';
+                });
+                steps.classList.remove('visible');
+                stepsBtn.textContent = 'Show Steps';
+            }
+
+            animateBtn.addEventListener('click', animate);
+            stepsBtn.addEventListener('click', () => toggleSteps(steps, stepsBtn));
+            resetBtn.addEventListener('click', reset);
+        }
+
+        // Problem 10: I2C vs SPI
+        function initI2cSpiAnimation() {
+            const spiBits = document.getElementById('i2c-spi-spi');
+            const i2cBits = document.getElementById('i2c-spi-i2c');
+            const steps = document.getElementById('i2c-spi-steps');
+            const animateBtn = document.getElementById('i2c-spi-animate-btn');
+            const stepsBtn = document.getElementById('i2c-spi-steps-btn');
+            const resetBtn = document.getElementById('i2c-spi-reset-btn');
+
+            for (let i = 0; i < 5; i++) {
+                spiBits.innerHTML += `<span class="bit low" style="left: ${i * 44}px;">0</span>`;
+                i2cBits.innerHTML += `<span class="bit low" style="left: ${i * 44}px;">0</span>`;
+            }
+
+            function animate() {
+                reset();
+                const spiSignal = '10101';
+                const i2cSignal = '11001';
+                spiSignal.split('').forEach((bit, i) => {
+                    setTimeout(() => {
+                        spiBits.children[i].classList.add('active');
+                        spiBits.children[i].classList.toggle('high', bit === '1');
+                        spiBits.children[i].classList.toggle('low', bit === '0');
+                        spiBits.children[i].textContent = bit;
+                        i2cBits.children[i].classList.add('active');
+                        i2cBits.children[i].classList.toggle('high', i2cSignal[i] === '1');
+                        i2cBits.children[i].classList.toggle('low', i2cSignal[i] === '0');
+                        i2cBits.children[i].textContent = i2cSignal[i];
+                        if (bit === '1') {
+                            spiBits.children[i].classList.add('connection');
+                            setTimeout(() => spiBits.children[i].classList.add('visible'), 100);
+                        }
+                    }, i * 500);
+                });
+                setTimeout(() => highlightSteps(steps), 5 * 500 + 500);
+            }
+
+            function reset() {
+                [...spiBits.children, ...i2cBits.children].forEach(bit => {
+                    bit.classList.remove('active', 'high', 'low', 'connection', 'visible');
+                    bit.classList.add('low');
+                    bit.textContent = '0';
+                });
+                steps.classList.remove('visible');
+                stepsBtn.textContent = 'Show Steps';
+            }
+
+            animateBtn.addEventListener('click', animate);
+            stepsBtn.addEventListener('click', () => toggleSteps(steps, stepsBtn));
+            resetBtn.addEventListener('click', reset);
+        }
+
+        // Problem 11: I2C Data Rate
+        function initI2cDataAnimation() {
+            const sdaBits = document.getElementById('i2c-data-sda');
+            const sclBits = document.getElementById('i2c-data-scl');
+            const steps = document.getElementById('i2c-data-steps');
+            const animateBtn = document.getElementById('i2c-data-animate-btn');
+            const stepsBtn = document.getElementById('i2c-data-steps-btn');
+            const resetBtn = document.getElementById('i2c-data-reset-btn');
+
+            for (let i = 0; i < 29; i++) {
+                sdaBits.innerHTML += `<span class="bit low" style="left: ${i * 44}px;">1</span>`;
+                sclBits.innerHTML += `<span class="bit low" style="left: ${i * 44}px;">0</span>`;
+            }
+
+            function animate() {
+                reset();
+                const sdaSignal = '01100000010100000101000001011';
+                const sclSignal = '00111111110111111110111111100';
+                sdaSignal.split('').forEach((sdaBit, i) => {
+                    setTimeout(() => {
+                        sdaBits.children[i].classList.add('active');
+                        sdaBits.children[i].classList.toggle('high', sdaBit === '1');
+                        sdaBits.children[i].classList.toggle('low', sdaBit === '0');
+                        sdaBits.children[i].textContent = sdaBit;
+                        sclBits.children[i].classList.add('active');
+                        sclBits.children[i].classList.toggle('high', sclSignal[i] === '1');
+                        sclBits.children[i].classList.toggle('low', sclSignal[i] === '0');
+                        sclBits.children[i].textContent = sclSignal[i];
+                        if (sclSignal[i] === '1' && sdaBit === '1') {
+                            sdaBits.children[i].classList.add('connection');
+                            setTimeout(() => sdaBits.children[i].classList.add('visible'), 100);
+                        }
+                    }, i * 200);
+                });
+                setTimeout(() => highlightSteps(steps), 29 * 200 + 500);
+            }
+
+            function reset() {
+                [...sdaBits.children].forEach(bit => {
+                    bit.classList.remove('active', 'high', 'low', 'connection', 'visible');
+                    bit.classList.add('low');
+                    bit.textContent = '1';
+                });
+                [...sclBits.children].forEach(bit => {
+                    bit.classList.remove('active', 'high', 'low', 'connection', 'visible');
+                    bit.classList.add('low');
+                    bit.textContent = '0';
+                });
+                steps.classList.remove('visible');
+                stepsBtn.textContent = 'Show Steps';
+            }
+
+            animateBtn.addEventListener('click', animate);
+            stepsBtn.addEventListener('click', () => toggleSteps(steps, stepsBtn));
+            resetBtn.addEventListener('click', reset);
+        }
+
+        // Utility Functions
+        function toggleSteps(steps, btn) {
+            steps.classList.toggle('visible');
+            btn.textContent = steps.classList.contains('visible') ? 'Hide Steps' : 'Show Steps';
+        }
+
+        function highlightSteps(steps) {
+            steps.classList.add('visible');
+            const paragraphs = steps.querySelectorAll('p');
+            paragraphs.forEach((p, i) => {
+                setTimeout(() => {
+                    paragraphs.forEach(p => p.classList.remove('step-highlight'));
+                    p.classList.add('step-highlight');
+                }, i * 800);
+            });
+        }
+
+        // Back to Top
+        window.onscroll = function() {
+            const btn = document.getElementById('back-to-top');
+            if (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) {
+                btn.style.display = 'block';
+            } else {
+                btn.style.display = 'none';
+            }
+        };
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Initialize animations
+        document.addEventListener('DOMContentLoaded', () => {
+            initSpiWordAnimation();
+            initSpiValueAnimation();
+            initUartEncodeAnimation();
+            initUartWordAnimation();
+            initParityAnimation();
+            initBaudWordsAnimation();
+            initBaudRateAnimation();
+            initParityErrorAnimation();
+            initI2cConfigAnimation();
+            initI2cSpiAnimation();
+            initI2cDataAnimation();
+        });
+    </script>
+</body>
+</html>

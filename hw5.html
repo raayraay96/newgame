@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECE362 HW5 Study Animations</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Open Sans', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+            color: #e0e0e0;
+        }
+        .navbar {
+            background-color: #1e3a8a;
+            padding: 15px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+        .navbar a {
+            float: left;
+            color: #fff;
+            text-align: center;
+            padding: 12px 20px;
+            text-decoration: none;
+            font-size: 18px;
+            font-family: 'Roboto', sans-serif;
+            transition: transform 0.2s, background-color 0.3s;
+        }
+        .navbar a:hover {
+            background-color: #3b82f6;
+            transform: scale(1.05);
+        }
+        h1 {
+            font-family: 'Roboto', sans-serif;
+            text-align: center;
+            color: #00ff88;
+            margin: 40px 0;
+            font-size: 2.5em;
+            text-shadow: 0 0 5px rgba(0, 255, 136, 0.5);
+        }
+        .content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .section {
+            background: #2a2a2a;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s;
+            animation: fadeIn 0.5s ease-in;
+        }
+        .section:hover {
+            transform: translateY(-5px);
+        }
+        h2 {
+            font-family: 'Roboto', sans-serif;
+            color: #00ff88;
+            margin-bottom: 15px;
+        }
+        .description {
+            font-size: 1.1em;
+            color: #b0b0b0;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        .description strong {
+            color: #00ff88;
+        }
+        .description .tooltip {
+            position: relative;
+            cursor: help;
+            border-bottom: 1px dotted #b0b0b0;
+        }
+        .description .tooltip:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e3a8a;
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.9em;
+            white-space: nowrap;
+            z-index: 10;
+        }
+        .signal-container {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            background: #3a3a3a;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .signal-row {
+            display: flex;
+            align-items: center;
+        }
+        .signal-label {
+            width: 80px;
+            font-weight: 600;
+            color: #b0b0b0;
+        }
+        .bit {
+            width: 40px;
+            height: 40px;
+            text-align: center;
+            line-height: 40px;
+            border: 2px solid #555;
+            border-radius: 8px;
+            margin: 0 4px;
+            background: #2a2a2a;
+            font-size: 16px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s;
+            position: relative;
+        }
+        .bit.active {
+            background-color: #00ff88;
+            color: #000;
+            border-color: #00ff88;
+            box-shadow: 0 4px 8px rgba(0, 255, 136, 0.4);
+        }
+        .bit.connection::after {
+            content: '';
+            position: absolute;
+            width: 2px;
+            height: 20px;
+            background: #facc15; /* Yellow for contrast */
+            bottom: -22px;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .bit.connection.visible::after {
+            opacity: 1;
+        }
+        .controls {
+            margin-top: 25px;
+            text-align: center;
+        }
+        button {
+            padding: 12px 25px;
+            margin: 0 10px;
+            cursor: pointer;
+            background: linear-gradient(135deg, #00ff88, #00cc66);
+            color: #000;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Roboto', sans-serif;
+            font-size: 16px;
+            transition: background 0.3s, transform 0.2s;
+        }
+        button:hover {
+            background: linear-gradient(135deg, #00cc66, #009944);
+            transform: scale(1.05);
+        }
+        .calculation-steps {
+            margin-top: 20px;
+            padding: 15px;
+            background: #444;
+            border-radius: 10px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease;
+        }
+        .calculation-steps.visible {
+            max-height: 200px;
+        }
+        .calculation-steps p {
+            margin: 10px 0;
+            color: #e0e0e0;
+        }
+        .step-highlight {
+            background-color: #00ff88;
+            color: #000;
+            padding: 5px;
+            border-radius: 5px;
+        }
+        #back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #1e3a8a;
+            color: #fff;
+            padding: 10px 15px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: none;
+            transition: opacity 0.3s;
+        }
+        #back-to-top:hover {
+            opacity: 0.8;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @media (max-width: 768px) {
+            .navbar a {
+                float: none;
+                display: block;
+                text-align: left;
+            }
+            h1 {
+                font-size: 2em;
+            }
+            .section {
+                padding: 20px;
+            }
+            .bit {
+                width: 30px;
+                height: 30px;
+                line-height: 30px;
+                margin: 0 2px;
+            }
+            .signal-label {
+                width: 60px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <a href="index.html">Home</a>
+        <a href="hw2.html">HW2</a>
+        <a href="hw3.html">HW3</a>
+        <a href="hw4.html">HW4</a>
+        <a href="hw5.html">HW5</a>
+        <a href="hw6.html">HW6</a>
+        <a href="hw7.html">HW7</a>
+    </div>
+    <h1>ECE362 HW5 Study Animations</h1>
+    <div class="content">
+        <div class="section" id="timer-section">
+            <h2>Problem 1: Timer Configurations</h2>
+            <div class="description">
+                This problem asks you to find which timer settings produce a <strong>1 Hz</strong> square wave with a <strong>50% duty cycle</strong> (half on, half off) using a <span class="tooltip" data-tooltip="Prescaler: Divides the clock frequency to slow down the timer.">prescaler</span> of 999 and a 100 kHz clock. You’re given options with <strong>ARR</strong> (reload value) and <strong>CCR</strong> (compare value) in different modes (e.g., Toggle, PWM). The animation shows Option e (Count Up, PWM, ARR=99, CCR=50), where the timer counts to 99, resets, and the output is high when the counter is less than 50, giving 50% duty cycle at 1 Hz.
+            </div>
+            <div class="signal-container">
+                <div class="signal-row">
+                    <span class="signal-label">Counter</span>
+                    <div class="signal-bits" id="timer-counter"></div>
+                </div>
+                <div class="signal-row">
+                    <span class="signal-label">Output</span>
+                    <div class="signal-bits" id="timer-output"></div>
+                </div>
+            </div>
+            <div class="calculation-steps" id="timer-steps">
+                <p>Timer Frequency = 100 kHz / (1+999) / (1+99) = 1 Hz</p>
+                <p>Duty Cycle = CCR / (ARR+1) = 50 / 100 = 50%</p>
+            </div>
+            <div class="controls">
+                <button id="timer-animate-btn">Animate</button>
+                <button id="timer-steps-btn">Show Steps</button>
+                <button id="timer-reset-btn">Reset</button>
+            </div>
+        </div>
+
+        <div class="section" id="sinewave-section">
+            <h2>Problem 5: Max Sinewave Frequency</h2>
+            <div class="description">
+                You’re using a <span class="tooltip" data-tooltip="Digital-to-Analog Converter: Turns digital values into analog signals.">DAC</span> to sample a sinewave table at <strong>500 kHz</strong>, and you need at least <strong>20 samples</strong> per wave to avoid distortion. This problem asks for the <strong>highest frequency</strong> you can produce without distortion. The animation simulates sampling a sinewave, showing how 20 samples fit into a 25 kHz cycle, calculated as 500,000 / 20 = 25,000 Hz.
+            </div>
+            <div class="signal-container">
+                <div class="signal-row">
+                    <span class="signal-label">Samples</span>
+                    <div class="signal-bits" id="sinewave-samples"></div>
+                </div>
+            </div>
+            <div class="calculation-steps" id="sinewave-steps">
+                <p>DAC Rate = 500,000 samples/second</p>
+                <p>Samples per Cycle = 20</p>
+                <p>Max Frequency = 500,000 / 20 = 25,000 Hz</p>
+            </div>
+            <div class="controls">
+                <button id="sinewave-animate-btn">Animate</button>
+                <button id="sinewave-steps-btn">Show Steps</button>
+                <button id="sinewave-reset-btn">Reset</button>
+            </div>
+        </div>
+
+        <div class="section" id="center-section">
+            <h2>Problem 9: Center-Aligned Timer</h2>
+            <div class="description">
+                This problem involves a <strong>center-aligned timer</strong> that counts up and down, forming a triangular waveform, with interrupts every <strong>10 ms</strong> at a <strong>100 kHz</strong> clock. You need to find the <strong>reload value (ARR)</strong>. Since it counts up to ARR and back down, one full cycle takes 2*ARR ticks, and the animation shows how ARR=500 fits the 10 ms interval (100,000 * 0.01 / 2 = 500).
+            </div>
+            <div class="signal-container">
+                <div class="signal-row">
+                    <span class="signal-label">Counter</span>
+                    <div class="signal-bits" id="center-counter"></div>
+                </div>
+            </div>
+            <div class="calculation-steps" id="center-steps">
+                <p>Cycles = 100 kHz * 10 ms = 1000</p>
+                <p>ARR = Cycles / 2 = 1000 / 2 = 500</p>
+            </div>
+            <div class="controls">
+                <button id="center-animate-btn">Animate</button>
+                <button id="center-steps-btn">Show Steps</button>
+                <button id="center-reset-btn">Reset</button>
+            </div>
+        </div>
+
+        <div class="section" id="wavetable-section">
+            <h2>Problem 8.1-8.3: Wavetable Step Calculations</h2>
+            <div class="description">
+                This problem demonstrates how a wavetable uses fractional steps to produce precise output frequencies. The animation shows how the <strong>step</strong> value (0x4f057) is calculated and how the offset wraps around after <strong>203</strong> iterations, with a visualization of the 16-bit shift operation.
+            </div>
+            <div class="signal-container">
+                <div class="signal-row">
+                    <span class="signal-label">Step</span>
+                    <div class="signal-bits" id="wavetable-step"></div>
+                </div>
+                <div class="signal-row">
+                    <span class="signal-label">Offset</span>
+                    <div class="signal-bits" id="wavetable-offset"></div>
+                </div>
+            </div>
+            <div class="calculation-steps" id="wavetable-steps">
+                <p>Step = (493883 * 2^14) / 1000 = 0x4f057</p>
+                <p>Offset increments by step each iteration</p>
+                <p>Wraps after 203 iterations (0x2945f4)</p>
+            </div>
+            <div class="controls">
+                <button id="wavetable-animate-btn">Animate</button>
+                <button id="wavetable-steps-btn">Show Steps</button>
+                <button id="wavetable-reset-btn">Reset</button>
+            </div>
+        </div>
+
+        <div class="section" id="bjt-section">
+            <h2>Problem 4: BJT Power Efficiency</h2>
+            <div class="description">
+                This problem demonstrates how a <strong>BJT transistor</strong> operates with a DAC signal. The animation shows the relationship between the <strong>DAC output</strong>, <strong>base current</strong>, and <strong>collector current</strong>, illustrating why slow-moving DAC signals are more power efficient.
+            </div>
+            <div class="signal-container">
+                <div class="signal-row">
+                    <span class="signal-label">DAC</span>
+                    <div class="signal-bits" id="dac-signal"></div>
+                </div>
+                <div class="signal-row">
+                    <span class="signal-label">Current</span>
+                    <div class="signal-bits" id="current-signal"></div>
+                </div>
+            </div>
+            <div class="calculation-steps" id="bjt-steps">
+                <p>BJT acts as a current-controlled current source</p>
+                <p>Slow DAC changes = Less switching losses</p>
+                <p>Power efficiency improved with gradual transitions</p>
+            </div>
+            <div class="controls">
+                <button id="bjt-animate-btn">Animate</button>
+                <button id="bjt-steps-btn">Show Steps</button>
+                <button id="bjt-reset-btn">Reset</button>
+            </div>
+        </div>
+
+        <div class="section" id="pwm-section">
+            <h2>Problem 3: PWM Duty Cycle</h2>
+            <div class="description">
+                This problem explores PWM duty cycle calculation with a <strong>100kHz</strong> clock source, <strong>prescaler=999</strong>, and <strong>ARR=24</strong>. The animation demonstrates how the PWM signal is off for 24 cycles and on for 1 cycle, resulting in a <strong>4%</strong> duty cycle.
+            </div>
+            <div class="signal-container">
+                <div class="signal-row">
+                    <span class="signal-label">PWM</span>
+                    <div class="signal-bits" id="pwm-signal"></div>
+                </div>
+            </div>
+            <div class="calculation-steps" id="pwm-steps">
+                <p>Total Period = ARR + 1 = 25 cycles</p>
+                <p>On Time = 1 cycle</p>
+                <p>Duty Cycle = 1/25 = 4%</p>
+            </div>
+            <div class="controls">
+                <button id="pwm-animate-btn">Animate</button>
+                <button id="pwm-steps-btn">Show Steps</button>
+                <button id="pwm-reset-btn">Reset</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Timer Animation (Problem 1)
+        function initTimerAnimation() {
+            const counterBits = document.getElementById('timer-counter');
+            const outputBits = document.getElementById('timer-output');
+            const steps = document.getElementById('timer-steps');
+            const animateBtn = document.getElementById('timer-animate-btn');
+            const stepsBtn = document.getElementById('timer-steps-btn');
+            const resetBtn = document.getElementById('timer-reset-btn');
+
+            for (let i = 0; i < 10; i++) {
+                counterBits.innerHTML += '<span class="bit">0</span>';
+                outputBits.innerHTML += '<span class="bit">0</span>';
+            }
+
+            function animate() {
+                reset();
+                let counter = 0;
+                const arr = 99;
+                const ccr = 50;
+                let direction = 1;
+
+                for (let i = 0; i < 10; i++) {
+                    setTimeout(() => {
+                        counterBits.children[i].textContent = Math.min(counter, 9);
+                        counterBits.children[i].classList.add('active');
+                        outputBits.children[i].textContent = counter < ccr ? '1' : '0';
+                        outputBits.children[i].classList.add('active');
+                        if (outputBits.children[i].textContent === '1') {
+                            outputBits.children[i].classList.add('connection');
+                            setTimeout(() => outputBits.children[i].classList.add('visible'), 100);
+                        }
+                        counter += 10 * direction;
+                        if (counter >= arr) direction = -1;
+                    }, i * 500);
+                }
+
+                setTimeout(() => highlightSteps(steps), 10 * 500 + 500);
+            }
+
+            function reset() {
+                [...counterBits.children, ...outputBits.children].forEach(bit => {
+                    bit.classList.remove('active', 'connection', 'visible');
+                    bit.textContent = '0';
+                });
+                steps.classList.remove('visible');
+                stepsBtn.textContent = 'Show Steps';
+            }
+
+            animateBtn.addEventListener('click', animate);
+            stepsBtn.addEventListener('click', () => toggleSteps(steps, stepsBtn));
+            resetBtn.addEventListener('click', reset);
+        }
+
+        // Sinewave Animation (Problem 5)
+        function initSinewaveAnimation() {
+            const samplesBits = document.getElementById('sinewave-samples');
+            const steps = document.getElementById('sinewave-steps');
+            const animateBtn = document.getElementById('sinewave-animate-btn');
+            const stepsBtn = document.getElementById('sinewave-steps-btn');
+            const resetBtn = document.getElementById('sinewave-reset-btn');
+
+            for (let i = 0; i < 20; i++) {
+                samplesBits.innerHTML += '<span class="bit">0</span>';
+            }
+
+            function animate() {
+                reset();
+                const samples = [0, 1, 2, 3, 4, 3, 2, 1, 0, -1, -2, -3, -4, -3, -2, -1, 0, 1, 2, 3];
+
+                samples.forEach((val, i) => {
+                    setTimeout(() => {
+                        samplesBits.children[i].textContent = val > 0 ? '1' : val < 0 ? '-1' : '0';
+                        samplesBits.children[i].classList.add('active');
+                        if (val !== 0) {
+                            samplesBits.children[i].classList.add('connection');
+                            setTimeout(() => samplesBits.children[i].classList.add('visible'), 100);
+                        }
+                    }, i * 250);
+                });
+
+                setTimeout(() => highlightSteps(steps), 20 * 250 + 500);
+            }
+
+            function reset() {
+                [...samplesBits.children].forEach(bit => {
+                    bit.classList.remove('active', 'connection', 'visible');
+                    bit.textContent = '0';
+                });
+                steps.classList.remove('visible');
+                stepsBtn.textContent = 'Show Steps';
+            }
+
+            animateBtn.addEventListener('click', animate);
+            stepsBtn.addEventListener('click', () => toggleSteps(steps, stepsBtn));
+            resetBtn.addEventListener('click', reset);
+        }
+
+        // Center-Aligned Timer Animation (Problem 9)
+        function initCenterAnimation() {
+            const counterBits = document.getElementById('center-counter');
+            const steps = document.getElementById('center-steps');
+            const animateBtn = document.getElementById('center-animate-btn');
+            const stepsBtn = document.getElementById('center-steps-btn');
+            const resetBtn = document.getElementById('center-reset-btn');
+
+            for (let i = 0; i < 10; i++) {
+                counterBits.innerHTML += '<span class="bit">0</span>';
+            }
+
+            function animate() {
+                reset();
+                let counter = 0;
+                const arr = 500;
+                let direction = 1;
+
+                for (let i = 0; i < 10; i++) {
+                    setTimeout(() => {
+                        counterBits.children[i].textContent = Math.min(Math.floor(counter / 50), 9);
+                        counterBits.children[i].classList.add('active');
+                        counter += 100 * direction;
+                        if (counter >= arr) direction = -1;
+                        if (counter <= 0) direction = 1;
+                    }, i * 500);
+                }
+
+                setTimeout(() => highlightSteps(steps), 10 * 500 + 500);
+            }
+
+            function reset() {
+                [...counterBits.children].forEach(bit => {
+                    bit.classList.remove('active', 'connection', 'visible');
+                    bit.textContent = '0';
+                });
+                steps.classList.remove('visible');
+                stepsBtn.textContent = 'Show Steps';
+            }
+
+            animateBtn.addEventListener('click', animate);
+            stepsBtn.addEventListener('click', () => toggleSteps(steps, stepsBtn));
+            resetBtn.addEventListener('click', reset);
+        }
+
+        // Wavetable Animation (Problem 8)
+        function initWavetableAnimation() {
+            const stepBits = document.getElementById('wavetable-step');
+            const offsetBits = document.getElementById('wavetable-offset');
+            const steps = document.getElementById('wavetable-steps');
+            const animateBtn = document.getElementById('wavetable-animate-btn');
+            const stepsBtn = document.getElementById('wavetable-steps-btn');
+            const resetBtn = document.getElementById('wavetable-reset-btn');
+
+            for (let i = 0; i < 10; i++) {
+                stepBits.innerHTML += '<span class="bit">0</span>';
+                offsetBits.innerHTML += '<span class="bit">0</span>';
+            }
+
+            function animate() {
+                reset();
+                const stepValue = 0x4f057;
+                let offset = 0;
+
+                for (let i = 0; i < 10; i++) {
+                    setTimeout(() => {
+                        stepBits.children[i].textContent = Math.min((stepValue >> (i * 2)) & 0xF, 9);
+                        stepBits.children[i].classList.add('active');
+                        offsetBits.children[i].textContent = Math.min((offset >> (i * 2)) & 0xF, 9);
+                        offsetBits.children[i].classList.add('active');
+                        offset += stepValue;
+                    }, i * 500);
+                }
+
+                setTimeout(() => highlightSteps(steps), 10 * 500 + 500);
+            }
+
+
+            function reset() {
+                [...stepBits.children, ...offsetBits.children].forEach(bit => {
+                    bit.classList.remove('active');
+                    bit.textContent = '0';
+                });
+                steps.classList.remove('visible');
+                stepsBtn.textContent = 'Show Steps';
+            }
+
+            animateBtn.addEventListener('click', animate);
+            stepsBtn.addEventListener('click', () => toggleSteps(steps, stepsBtn));
+            resetBtn.addEventListener('click', reset);
+        }
+
+        // PWM Animation (Problem 3)
+        function initPWMAnimation() {
+            const pwmSignalBits = document.getElementById('pwm-signal');
+            const steps = document.getElementById('pwm-steps');
+            const animateBtn = document.getElementById('pwm-animate-btn');
+            const stepsBtn = document.getElementById('pwm-steps-btn');
+            const resetBtn = document.getElementById('pwm-reset-btn');
+
+            for (let i = 0; i < 25; i++) {
+                pwmSignalBits.innerHTML += '<span class="bit">0</span>';
+            }
+
+            function animate() {
+                reset();
+                for (let i = 0; i < 25; i++) {
+                    setTimeout(() => {
+                        pwmSignalBits.children[i].textContent = (i < 1) ? '1' : '0'; // ON for 1 cycle, OFF for 24
+                        pwmSignalBits.children[i].classList.add('active');
+                        if (pwmSignalBits.children[i].textContent === '1') {
+                            pwmSignalBits.children[i].classList.add('connection');
+                            setTimeout(() => pwmSignalBits.children[i].classList.add('visible'), 100);
+                        }
+                    }, i * 200);
+                }
+                setTimeout(() => highlightSteps(steps), 25 * 200 + 500);
+            }
+
+            function reset() {
+                [...pwmSignalBits.children].forEach(bit => {
+                    bit.classList.remove('active', 'connection', 'visible');
+                    bit.textContent = '0';
+                });
+                steps.classList.remove('visible');
+                stepsBtn.textContent = 'Show Steps';
+            }
+
+            animateBtn.addEventListener('click', animate);
+            stepsBtn.addEventListener('click', () => toggleSteps(steps, stepsBtn));
+            resetBtn.addEventListener('click', reset);
+        }
+
+        // BJT Animation (Problem 4)
+        function initBJTAnimation() {
+            const dacSignal = document.getElementById('dac-signal');
+            const currentSignal = document.getElementById('current-signal');
+            const steps = document.getElementById('bjt-steps');
+            const animateBtn = document.getElementById('bjt-animate-btn');
+            const stepsBtn = document.getElementById('bjt-steps-btn');
+            const resetBtn = document.getElementById('bjt-reset-btn');
+
+            for (let i = 0; i < 10; i++) {
+                dacSignal.innerHTML += '<span class="bit">0</span>';
+                currentSignal.innerHTML += '<span class="bit">0</span>';
+            }
+
+            function animate() {
+                reset();
+                const values = [0, 1, 2, 3, 4, 5, 4, 3, 2, 1];
+
+                values.forEach((val, i) => {
+                    setTimeout(() => {
+                        dacSignal.children[i].textContent = val;
+                        dacSignal.children[i].classList.add('active');
+                        currentSignal.children[i].textContent = Math.floor(val * 1.5);
+                        currentSignal.children[i].classList.add('active');
+                        if (val > 0) {
+                            currentSignal.children[i].classList.add('connection');
+                            setTimeout(() => currentSignal.children[i].classList.add('visible'), 100);
+                        }
+                    }, i * 300);
+                });
+
+                setTimeout(() => highlightSteps(steps), 10 * 300 + 500);
+            }
+
+            function reset() {
+                [...dacSignal.children, ...currentSignal.children].forEach(bit => {
+                    bit.classList.remove('active', 'connection', 'visible');
+                    bit.textContent = '0';
+                });
+                steps.classList.remove('visible');
+                stepsBtn.textContent = 'Show Steps';
+            }
+
+            animateBtn.addEventListener('click', animate);
+            stepsBtn.addEventListener('click', () => toggleSteps(steps, stepsBtn));
+            resetBtn.addEventListener('click', reset);
+        }
+
+
+        // Utility Functions
+        function toggleSteps(steps, btn) {
+            steps.classList.toggle('visible');
+            btn.textContent = steps.classList.contains('visible') ? 'Hide Steps' : 'Show Steps';
+        }
+
+        function highlightSteps(steps) {
+            steps.classList.add('visible');
+            const paragraphs = steps.querySelectorAll('p');
+            paragraphs.forEach((p, i) => {
+                setTimeout(() => {
+                    paragraphs.forEach(p => p.classList.remove('step-highlight'));
+                    p.classList.add('step-highlight');
+                }, i * 800);
+            });
+        }
+
+        // Back to Top
+        window.onscroll = function() {
+            const btn = document.getElementById('back-to-top');
+            if (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) {
+                btn.style.display = 'block';
+            } else {
+                btn.style.display = 'none';
+            }
+        };
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Initialize animations
+        document.addEventListener('DOMContentLoaded', () => {
+            initTimerAnimation();
+            initSinewaveAnimation();
+            initCenterAnimation();
+            initWavetableAnimation();
+            initPWMAnimation();
+            initBJTAnimation();
+        });
+    </script>
+</body>
+</html>

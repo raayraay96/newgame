@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECE362 HW7 Study Animations</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Open Sans', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #e0eafc, #cfdef3);
+            color: #333;
+        }
+        .navbar {
+            background-color: #1e3a8a; /* Darker blue */
+            padding: 15px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .navbar a {
+            float: left;
+            color: #fff;
+            text-align: center;
+            padding: 12px 20px;
+            text-decoration: none;
+            font-size: 18px;
+            font-family: 'Roboto', sans-serif;
+            transition: transform 0.2s, background-color 0.3s;
+        }
+        .navbar a:hover {
+            background-color: #3b82f6; /* Lighter blue */
+            transform: scale(1.05);
+        }
+        h1 {
+            font-family: 'Roboto', sans-serif;
+            text-align: center;
+            color: #1e3a8a;
+            margin: 40px 0;
+            font-size: 2.5em;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        }
+        .content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .card {
+            background: #fff;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: transform 0.3s;
+            animation: fadeIn 0.5s ease-in;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .coming-soon {
+            font-size: 1.2em;
+            color: #666;
+            margin: 20px 0;
+        }
+        .icon {
+            font-size: 3em;
+            color: #4CAF50;
+            margin-bottom: 20px;
+        }
+        .progress-bar {
+            width: 100%;
+            background: #ddd;
+            height: 10px;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+        .progress {
+            width: 10%; /* Placeholder progress */
+            height: 100%;
+            background: #4CAF50;
+            transition: width 1s ease;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 25px;
+            background-color: #4CAF50;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            font-family: 'Roboto', sans-serif;
+            margin-top: 20px;
+            transition: background-color 0.3s;
+        }
+        .btn:hover {
+            background-color: #45a049;
+        }
+        #back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #1e3a8a;
+            color: #fff;
+            padding: 10px 15px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: none;
+            transition: opacity 0.3s;
+        }
+        #back-to-top:hover {
+            opacity: 0.8;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @media (max-width: 768px) {
+            .navbar a {
+                float: none;
+                display: block;
+                text-align: left;
+            }
+            h1 {
+                font-size: 2em;
+            }
+            .card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <a href="index.html">Home</a>
+        <a href="hw2.html">HW2</a>
+        <a href="hw3.html">HW3</a>
+        <a href="hw4.html">HW4</a>
+        <a href="hw5.html">HW5</a>
+        <a href="hw6.html">HW6</a>
+        <a href="hw7.html">HW7</a>
+    </div>
+    <h1>ECE362 HW7 Study Animations</h1>
+    <div class="content">
+        <div class="card">
+            <div class="icon">⏳</div>
+            <p class="coming-soon">Content for HW7 is coming soon!</p>
+            <p>Stay tuned for interactive animations and study materials to help you master HW7 concepts.</p>
+            <div class="progress-bar">
+                <div class="progress"></div>
+            </div>
+            <a href="index.html" class="btn">Back to Home</a>
+        </div>
+    </div>
+    <div id="back-to-top" onclick="scrollToTop()">↑</div>
+
+    <script>
+        // Back to Top functionality
+        window.onscroll = function() {
+            const btn = document.getElementById('back-to-top');
+            if (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) {
+                btn.style.display = 'block';
+            } else {
+                btn.style.display = 'none';
+            }
+        };
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
